@@ -5,13 +5,15 @@ import {
   Route,
   Link,
   Navigate,
-  useNavigate
+  useNavigate,
+  useMatch
 } from "react-router-dom"
 
-const Menu = (props) => {
+const Menu = () => {
   const padding = {
     paddingRight: 5
   }
+  
   return (
     <div>
       <div>
@@ -19,12 +21,19 @@ const Menu = (props) => {
         <Link style={padding} to="/create">create new</Link>
         <Link style={padding} to="/about">about</Link>
       </div>
-      
-      <Routes>
-        <Route path="/" element={<AnecdoteList anecdotes={props.anecdotes} />} />
-        <Route path="/create" element={<CreateNew addNew={props.addNew} />} />
-        <Route path="/about" element={<About />} />
-      </Routes>
+    </div>
+  )
+}
+
+const Anecdote = ({ anecdote }) => {
+  return (
+    <div>
+      <h2>{anecdote.content}</h2>
+      <h3>by {anecdote.author}</h3>
+      <div>
+        <p>This anecdote has {anecdote.votes} votes.</p>
+        <p>For more info, see <a href={anecdote.info}>{anecdote.info}</a></p>
+      </div>
     </div>
   )
 }
@@ -33,7 +42,9 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote => <li key={anecdote.id}>
+        <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>)}
     </ul>
   </div>
 )
@@ -140,10 +151,21 @@ const App = () => {
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdote = match
+    ? anecdotes.find(anecdote => anecdote.id === Number(match.params.id))
+    : null
+
   return (
     <div>
       <h1>Software anecdotes</h1>
-      <Menu anecdotes={anecdotes} addNew={addNew} />
+      <Menu />
+      <Routes>
+        <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route path="/create" element={<CreateNew addNew={addNew} />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
+      </Routes>
       <Footer />
     </div>
   )
