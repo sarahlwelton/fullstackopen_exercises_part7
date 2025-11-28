@@ -30,7 +30,7 @@ const useCountry = (name) => {
         setCountry({ found: false })
       })
   }, [name])
-  console.log(country)
+  
   return country
 }
 
